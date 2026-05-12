@@ -48,7 +48,7 @@ glibc 支持以下 Linux 架构:
 |--------|----------|------|
 | **NPTL 线程库** | [../pthread/](../pthread/) | 线程创建、互斥锁、条件变量、屏障、TSD、信号量、TLS、Futex、栈空间布局、pthread_cancel/cleanup 深度分析 等 13 篇 |
 | **ptmalloc2 内存分配器** | [../malloc/](../malloc/) | 数据结构、分配路径、释放路径、Arena/Tcache、调优调试 5 篇 |
-| **ld.so 动态链接器** | [../elf/](../elf/) | 启动加载、符号解析、重定位绑定、dlopen、AArch64 重定位、vDSO 机制、dlopen 搜索/dladdr/dl_iterate_phdr、ldconfig 与 ld.so.cache 管理 8 篇 |
+| **ld.so 动态链接器** | [../elf/](../elf/) | 启动加载、符号解析、重定位绑定、dlopen、AArch64 重定位、vDSO 机制、dlopen 搜索/dladdr、ldconfig/ld.so.cache、dl-tls/object/sort/find 9 篇 |
 | **信号子系统** | [../signal/](../signal/) | 数据结构、sigaction 调用链、信号掩码、线程交互、AArch64 信号帧、SIGCANCEL/SIGSETXID 内部信号 6 篇 |
 | **stdio/IO 子系统** | [../stdio/](../stdio/) | FILE 结构与 vtable、流生命周期与缓冲、读写路径与刷新机制 3 篇 |
 

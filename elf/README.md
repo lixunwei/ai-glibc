@@ -16,6 +16,7 @@
 | [06-vDSO机制分析.md](06-vDSO机制分析.md) | vDSO 虚拟共享库机制 | 内核映射、符号查找、clock_gettime 加速、IFUNC |
 | [07-dlopen搜索与dladdr反查.md](07-dlopen搜索与dladdr反查.md) | dlopen/dladdr/dl_iterate_phdr 深度分析 | 库搜索顺序（RPATH→RUNPATH→cache）、DST 替换、ld.so.cache 二分搜索、dev/ino 去重、dladdr 线性扫描算法、dl_iterate_phdr 遍历机制、dlinfo 元信息查询 |
 | [08-ldconfig与ld.so.cache管理.md](08-ldconfig与ld.so.cache管理.md) | ldconfig 工具与缓存管理机制 | ldconfig 主流程、/etc/ld.so.conf 解析、目录扫描与 ELF soname 提取、ld.so.cache 新旧格式、排序与原子写入、运行时二分搜索、glibc-hwcaps 优先级、辅助缓存 |
+| [09-dl-tls与辅助模块分析.md](09-dl-tls与辅助模块分析.md) | TLS 管理与动态链接器辅助模块 | DTV/slotinfo 数据结构、静态/动态 TLS、__tls_get_addr 解析、代际更新、link_map 创建（dl-object）、依赖拓扑排序（dl-sort-maps）、快速地址查找（dl-find_object）、STM 并发安全 |
 
 ---
 
