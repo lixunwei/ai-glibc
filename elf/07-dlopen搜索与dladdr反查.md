@@ -609,15 +609,15 @@ static void dlinfo_doit (void *argsblock)
 
 | 请求 | 值 | 返回内容 | 定义位置 |
 |------|-----|---------|---------|
-| `RTLD_DI_LMID` | 1 | 命名空间 ID | `dlfcn/dlfcn.h:137` |
-| `RTLD_DI_LINKMAP` | 2 | link_map 指针 | `dlfcn/dlfcn.h:139` |
-| `RTLD_DI_SERINFO` | 4 | 搜索路径列表 | `dlfcn/dlfcn.h:143` |
+| `RTLD_DI_LMID` | 1 | 命名空间 ID | `dlfcn/dlfcn.h:131` |
+| `RTLD_DI_LINKMAP` | 2 | link_map 指针 | `dlfcn/dlfcn.h:135` |
+| `RTLD_DI_SERINFO` | 4 | 搜索路径列表 | `dlfcn/dlfcn.h:144` |
 | `RTLD_DI_SERINFOSIZE` | 5 | 搜索路径列表大小 | `dlfcn/dlfcn.h:145` |
-| `RTLD_DI_ORIGIN` | 6 | $ORIGIN 目录 | `dlfcn/dlfcn.h:147` |
-| `RTLD_DI_ORIGIN_PATH` | 12 | $ORIGIN 路径指针 | `dlfcn/dlfcn.h:175` |
-| `RTLD_DI_TLS_MODID` | 9 | TLS 模块 ID | `dlfcn/dlfcn.h:163` |
-| `RTLD_DI_TLS_DATA` | 10 | 当前线程 TLS 块 | `dlfcn/dlfcn.h:167` |
-| `RTLD_DI_PHDR` | 11 | 程序头表 | `dlfcn/dlfcn.h:171` |
+| `RTLD_DI_ORIGIN` | 6 | $ORIGIN 目录 | `dlfcn/dlfcn.h:149` |
+| `RTLD_DI_ORIGIN_PATH` | 12 | $ORIGIN 路径指针 | `dlfcn/dlfcn.h:173` |
+| `RTLD_DI_TLS_MODID` | 9 | TLS 模块 ID | `dlfcn/dlfcn.h:157` |
+| `RTLD_DI_TLS_DATA` | 10 | 当前线程 TLS 块 | `dlfcn/dlfcn.h:163` |
+| `RTLD_DI_PHDR` | 11 | 程序头表 | `dlfcn/dlfcn.h:168` |
 
 `RTLD_DI_SERINFO` / `RTLD_DI_SERINFOSIZE` 提供了一种编程方式获取
 dlopen 搜索特定库时将使用的完整目录列表（RPATH、LD_LIBRARY_PATH、
@@ -737,4 +737,4 @@ namespace[0]._ns_loaded
 | `elf/dl-iteratephdr.c` | 30-87 | `__dl_iterate_phdr` 完整实现 |
 | `dlfcn/dladdr1.c` | 23-41 | `__dladdr1` 扩展接口 |
 | `dlfcn/dlinfo.c` | 37-96 | `dlinfo_doit` 请求分发 |
-| `dlfcn/dlfcn.h` | 137-175 | `RTLD_DI_*` 常量定义 |
+| `dlfcn/dlfcn.h` | 128-176 | `RTLD_DI_*` 常量定义 |
