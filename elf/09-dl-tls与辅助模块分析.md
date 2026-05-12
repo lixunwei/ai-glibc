@@ -173,18 +173,18 @@ _dl_determine_tlsoffset():
   │   从 offset=0 开始，向负方向增长
   │   每个模块: offset += blocksize + alignment_padding
   │   l->l_tls_offset = offset（正值，表示 TP-offset 距离）
-  │   dl-tls.c:291-376
+  │   dl-tls.c:291-373
   │
   ├─ TLS_DTV_AT_TP 模式（AArch64）:
   │   从 TCB 之后开始，向正方向增长
   │   每个模块: offset = roundup(current, align) + firstbyte
   │   l->l_tls_offset = offset
-  │   dl-tls.c:378-463
+  │   dl-tls.c:374-456
   │
   └─ 间隙复用优化:
       如果两个模块之间的对齐间隙足够大
       下一个小模块可以嵌入间隙中
-      dl-tls.c:306-331 / dl-tls.c:409-434
+      dl-tls.c:306-331 / dl-tls.c:389-414
 ```
 
 间隙复用示意:
@@ -358,8 +358,9 @@ __tls_get_addr(tls_index *ti):
   │     → tls_get_addr_tail(ti, dtv, NULL)  // 延迟分配
   │     dl-tls.c:1132-1138
   │
-  └─ 返回 p + ti->ti_offset
-      dl-tls.c:1141
+  └─ 返回 tls_get_addr_adjust(p, ti)
+      → 计算 (uintptr_t)p + ti_offset + TLS_DTV_OFFSET
+      dl-tls.c:1141（实际调整在 dl-tls.c:985-994 的内联函数中）
 ```
 
 ### 5.2 延迟分配
@@ -510,7 +511,7 @@ static void init_one_static_tls(struct pthread *curp, struct link_map *map)
 
 ### 8.1 _dl_new_object()
 
-`dl-object.c:54-260`——link_map 工厂函数：
+`dl-object.c:54-263`——link_map 工厂函数：
 
 ```
 _dl_new_object(realname, libname, type, loader, mode, nsid):
@@ -842,9 +843,11 @@ _dl_find_object_init():
 
 ```
 _dl_find_object_update(new_maps):
-  ├─ 按 map_start 排序新对象
-  ├─ 合并到事务性段链表
-  └─ 切换活跃版本（原子递增 version）
+  ├─ 收集未处理的 link_map 到数组
+  ├─ 按 map_start 排序
+  └─ 调用 _dl_find_object_update_1() (dl-find_object.c:669-805)
+      ├─ 合并到事务性段链表
+      └─ 切换活跃版本（原子递增 version）
 ```
 
 **dlclose 标记**（`_dl_find_object_dlclose`，`dl-find_object.c:834-864`）：
@@ -947,7 +950,7 @@ _dl_open()
 | `sysdeps/aarch64/nptl/tls.h` | 43-47 | AArch64 `tcbhead_t` 定义 |
 | `sysdeps/aarch64/nptl/tls.h` | 74-75 | AArch64 `TLS_INIT_TP` |
 | `elf/dl-object.c` | 28-51 | `_dl_add_to_namespace_list` |
-| `elf/dl-object.c` | 54-260 | `_dl_new_object` link_map 创建 |
+| `elf/dl-object.c` | 54-263 | `_dl_new_object` link_map 创建 |
 | `elf/dl-sort-maps.c` | 28-122 | `_dl_sort_maps_original` 原始排序 |
 | `elf/dl-sort-maps.c` | 134-173 | `dfs_traversal` DFS 遍历 |
 | `elf/dl-sort-maps.c` | 175-285 | `_dl_sort_maps_dfs` DFS 拓扑排序 |

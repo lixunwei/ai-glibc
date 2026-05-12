@@ -64,7 +64,7 @@
 ```
 main(argc, argv):
   │
-  ├─ 1. 设置 locale (LC_ALL="", LC_COLLATE="C")
+  ├─ 1. 设置 locale (LC_ALL="", LC_COLLATE="C") + textdomain
   │     ldconfig.c:1033-1041
   │
   ├─ 2. argp_parse() 解析命令行参数
@@ -150,7 +150,7 @@ ldconfig_parse_config_1(config_file, chroot, callback):
   ├─ 逐行读取 (getline):
   │   ldconfig-parse.c:103-107
   │   │
-  │   ├─ 去除注释 (#) 和首尾空白
+  │   ├─ 去除注释 (#) 和行首空白
   │   │   ldconfig-parse.c:110-123
   │   │
   │   ├─ 跳过空行
@@ -311,8 +311,8 @@ search_dir()
 
 `process_file()` 处理多种格式（`readlib.c:58-170`）：
 - 检查 ELF 魔数 → 调用 `process_elf_file()`
-- 检查链接器脚本（如 `GROUP ( ... )`）→ 递归处理
-- 其他格式（a.out 等）→ 忽略
+- 检查链接器脚本（如 `GROUP ( ... )`）→ 识别后跳过（抑制错误输出）
+- a.out 格式 → 合成 soname 并返回
 
 ### 5.2 ELF 处理流程
 
@@ -486,7 +486,7 @@ void add_to_cache(path, filename, soname, flags, isa_level, hwcaps)
 排序优先级:
 1. 库名（soname）: 使用 _dl_cache_libcmp() 逆序
    → 数字部分按数值比较，确保版本号正确排序
-2. flags: 数值小的在前
+2. flags: 数值大的在前（高标志优先）
 3. glibc-hwcaps 条目在非 hwcaps 条目之前
    → 确保 search_cache 优先匹配 hwcaps 版本
 4. hwcaps 子目录名: 字典序
@@ -513,13 +513,17 @@ save_cache(cache_name):
   │     stringtable_finalize()
   │     cache.c:551-552
   │
-  ├─ 4. 构建旧格式条目数组（如果需要）
+  ├─ 4. 构建旧格式头部和数组（如果需要）
   │     填充 struct cache_file + file_entry[]
-  │     cache.c:554-615
+  │     cache.c:554-577
   │
-  ├─ 5. 构建新格式条目数组
-  │     填充 struct cache_file_new + file_entry_new[]
-  │     设置 hwcap 字段（glibc-hwcaps 索引 | ISA 级别）
+  ├─ 5. 构建新格式头部（如果需要）
+  │     填充 struct cache_file_new 头 + 条目数组
+  │     cache.c:579-599
+  │
+  ├─ 6. 填充条目 + 设置扩展偏移
+  │     遍历链表，填充旧/新格式条目、hwcap 字段
+  │     计算 extension_offset
   │     cache.c:617-673
   │
   ├─ 6. 写入临时文件:
@@ -713,12 +717,22 @@ void _dl_unload_cache(void)
 ```
 glibc_hwcaps_priorities_init():
   │
-  ├─ 读取缓存扩展区的 glibc-hwcaps 子目录名列表
-  ├─ 对每个子目录名:
-  │   ├─ 检查 /etc/ld.so.conf 是否存在对应 glibc-hwcaps 目录
-  │   ├─ 调用 _dl_hwcaps_subdirs_active() 检查 CPU 是否支持
-  │   └─ 分配优先级值（越小越优先）
-  └─ 排序优先级数组
+  ├─ 从缓存扩展区加载 glibc-hwcaps 子目录索引数组
+  │   cache_extension_load()
+  │   dl-cache.c:86-88
+  │
+  ├─ 与预计算的 _dl_hwcaps_priorities 数组合并:
+  │   ├─ 双指针遍历（缓存数组 vs 运行时能力数组）
+  │   ├─ 匹配 → 赋予运行时优先级值
+  │   ├─ 不匹配 → 优先级 = 0（不可用）
+  │   dl-cache.c:107-149
+  │
+  └─ glibc_hwcaps_priorities_length = length
+
+glibc_hwcaps_priority(index):
+  ├─ 首次调用触发 init
+  └─ 返回 priorities[index]（0=不可用，越小越优先）
+  dl-cache.c:155-169
 
 search_cache() 中的 hwcap 选择:
   ├─ glibc_hwcaps_priority(hwcap_index) 返回优先级
