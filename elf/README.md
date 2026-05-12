@@ -14,6 +14,7 @@
 | [04-dlopen与运行时加载.md](04-dlopen与运行时加载.md) | 运行时动态加载 API | dlopen/dlsym/dlclose、引用计数、命名空间 |
 | [05-AArch64重定位与绑定.md](05-AArch64重定位与绑定.md) | ARM64 平台重定位机制 | PLT/GOT 格式、TLSDESC、BTI/PAC、Variant PCS |
 | [06-vDSO机制分析.md](06-vDSO机制分析.md) | vDSO 虚拟共享库机制 | 内核映射、符号查找、clock_gettime 加速、IFUNC |
+| [07-dlopen搜索与dladdr反查.md](07-dlopen搜索与dladdr反查.md) | dlopen/dladdr/dl_iterate_phdr 深度分析 | 库搜索顺序（RPATH→RUNPATH→cache）、DST 替换、ld.so.cache 二分搜索、dev/ino 去重、dladdr 线性扫描算法、dl_iterate_phdr 遍历机制、dlinfo 元信息查询 |
 
 ---
 
