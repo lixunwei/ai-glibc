@@ -31,7 +31,7 @@ dlopen(filename, flags)
     → _dlerror_run(dlopen_doit)              错误捕获包装
       → dlopen_doit()                        dlfcn/dlopen.c:46-60
         → _dl_open(filename, mode, ...)      elf/dl-open.c:812
-          → _dl_open_worker_begin()          elf/dl-open.c:513-747
+          → dl_open_worker_begin()           elf/dl-open.c:513-748
             → _dl_map_object()               elf/dl-load.c:2191-2199
               → _dl_lookup_map()             名称匹配已加载
               → _dl_map_new_object()         实际搜索+加载
@@ -133,7 +133,7 @@ open_path(name, namelen, mode, search_path_struct, ...):
 
 ### 2.1 LD_LIBRARY_PATH 解析
 
-`_dl_init_paths()` 在 ld.so 启动时解析 LD_LIBRARY_PATH（`dl-load.c:800-831`）：
+`_dl_init_paths()` 在 ld.so 启动时解析 LD_LIBRARY_PATH（`dl-load.c:678-832`，其中 LD_LIBRARY_PATH 解析在 `800-831`）：
 
 ```c
 // 按 ':' 和 ';' 分割
@@ -358,7 +358,7 @@ _dl_file_id_match_p (const struct r_file_id *a, const struct r_file_id *b)
 
 ## 5. _dl_map_object_from_fd——从 fd 到 link_map
 
-文件找到并通过 dev/ino 去重后，进入 ELF 加载核心（`dl-load.c:938-1315`）：
+文件找到并通过 dev/ino 去重后，进入 ELF 加载核心（`dl-load.c:938-1458`）：
 
 ```
 _dl_map_object_from_fd(name, fd, fbp, realname, loader, ...):
@@ -382,13 +382,12 @@ _dl_map_object_from_fd(name, fd, fbp, realname, loader, ...):
   │     dl-load.c:1072-1160
   │
   ├─ 6. mmap 所有 PT_LOAD 段
-  │     第一段: mmap(NULL, ...)   → 基址
-  │     后续段: mmap(fixed, ...)  → 相对偏移
-  │     dl-load.c:1162-1218
+  │     调用 _dl_map_segments() 映射
+  │     dl-load.c:1259-1264（实际映射在 dl-map-segments.h）
   │
   ├─ 7. 处理 .dynamic 段
   │     解析 DT_* 标记，填充 l_info[] 数组
-  │     dl-load.c:1220-1235
+  │     dl-load.c:1273-1276
   │
   ├─ 8. 安全检查
   │     拒绝 ET_EXEC (dlopen 只能加载 ET_DYN)
@@ -396,7 +395,9 @@ _dl_map_object_from_fd(name, fd, fbp, realname, loader, ...):
   │     dl-load.c:1236-1291
   │
   └─ 9. 设置 l_file_id、关闭 fd、处理 GNU_PROPERTY
-        dl-load.c:1293-1315
+        GNU_PROPERTY: dl-load.c:1337-1346
+        关闭 fd:      dl-load.c:1348-1355
+        l_file_id:    dl-load.c:1407-1408
 ```
 
 ---
@@ -716,8 +717,8 @@ namespace[0]._ns_loaded
 | `elf/dl-load.c` | 265-366 | `_dl_dst_substitute` DST 替换 |
 | `elf/dl-load.c` | 374-401 | `expand_dynamic_string_token` 展开入口 |
 | `elf/dl-load.c` | 443-549 | `fillin_rpath` 路径列表规范化 |
-| `elf/dl-load.c` | 800-831 | `_dl_init_paths` 中 LD_LIBRARY_PATH 解析 |
-| `elf/dl-load.c` | 938-1315 | `_dl_map_object_from_fd` 从 fd 到 link_map |
+| `elf/dl-load.c` | 678-832 | `_dl_init_paths` 路径初始化（含 LD_LIBRARY_PATH 解析 800-831）|
+| `elf/dl-load.c` | 938-1458 | `_dl_map_object_from_fd` 从 fd 到 link_map |
 | `elf/dl-load.c` | 999-1013 | dev/ino 去重检查 |
 | `elf/dl-load.c` | 1737-1894 | `open_path` 目录逐一尝试 |
 | `elf/dl-load.c` | 1896-1926 | `_dl_lookup_map` 名称匹配已加载 |
