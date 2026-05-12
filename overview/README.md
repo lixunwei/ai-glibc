@@ -52,17 +52,13 @@ glibc 支持以下 Linux 架构:
 | **信号子系统** | [../signal/](../signal/) | 数据结构、sigaction 调用链、信号掩码、线程交互、AArch64 信号帧、SIGCANCEL/SIGSETXID 内部信号 6 篇 |
 | **stdio/IO 子系统** | [../stdio/](../stdio/) | FILE 结构与 vtable、流生命周期与缓冲、读写路径与刷新机制 3 篇 |
 
-## AArch64 硬件扩展专题
+## 专题分析
 
 | 文档 | 内容 |
 |------|------|
 | [10-AArch64硬件扩展支持.md](10-AArch64硬件扩展支持.md) | SVE/SME/MOPS/MTE/BTI/PAC/GCS 七大扩展的 glibc 支持实现 |
-
-## 全局架构关系图
-
-| 文档 | 内容 |
-|------|------|
 | [11-全局架构关系图.md](11-全局架构关系图.md) | 库文件构成、模块分层、启动时序、跨子系统交互、数据流图、AArch64 sysdeps 分层、HWCAP 传播、vDSO 集成 |
+| [12-_GNU_SOURCE宏分析.md](12-_GNU_SOURCE宏分析.md) | 特性测试宏机制、features.h 处理流程、__USE_GNU 守卫的 227 个功能块分类汇总 |
 
 ## 辅助文档
 
