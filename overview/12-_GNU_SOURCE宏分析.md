@@ -52,7 +52,7 @@ include/features.h:445-446
          └─ 定义 __USE_GNU=1    ← 这是头文件中实际使用的条件守卫
 ```
 
-核心内部宏 `__USE_GNU` 在 98 个头文件中共出现 **227 个条件守卫块**，
+核心内部宏 `__USE_GNU` 在 116 个头文件中共出现 **311 个条件守卫块**，
 控制着数百个 GNU 扩展函数、常量和类型的可见性。
 
 ### 1.3 关键源码位置
@@ -61,7 +61,7 @@ include/features.h:445-446
 |------|------|------|
 | `include/features.h` | 218-245 | `_GNU_SOURCE` → 开启所有子特性宏 |
 | `include/features.h` | 445-446 | `_GNU_SOURCE` → `__USE_GNU=1` |
-| `include/features.h` | 90-111 | 所有 `__USE_*` 内部宏的说明 |
+| `include/features.h` | 86-111 | 所有 `__USE_*` 内部宏的说明 |
 
 ---
 
@@ -297,17 +297,17 @@ include/features.h:445-446
 ### 4.1 影响文件统计
 
 ```
-__USE_GNU 守卫出现的头文件数量:      98 个
-__USE_GNU 条件守卫块总数:            227 个
+__USE_GNU 守卫出现的头文件数量:      116 个
+__USE_GNU 条件守卫块总数:            311 个
 
 按类别分布:
   fcntl 相关 (bits/fcntl-linux.h):   ~15 个守卫块
   locale/langinfo.h:                  ~25 个守卫块（各种 NL_* 常量）
   stdio.h:                            ~8 个守卫块
-  pthread.h:                          ~8 个守卫块
+  pthread.h:                          ~18 个守卫块
   wchar.h:                            ~8 个守卫块
   unistd.h:                           ~10 个守卫块
-  其他:                               ~150+ 个守卫块
+  其他:                               ~230+ 个守卫块
 ```
 
 ### 4.2 `__USE_GNU` 独有 vs 通过子宏间接开启
@@ -449,10 +449,10 @@ scanf("%ms", &buf);
 
 | 源文件 | 行号 | 内容 |
 |--------|------|------|
-| `include/features.h` | 55-68 | 用户可定义的特性测试宏列表 |
-| `include/features.h` | 90-111 | `__USE_*` 内部宏说明 |
+| `include/features.h` | 24-68 | 用户可定义的特性测试宏列表 |
+| `include/features.h` | 86-111 | `__USE_*` 内部宏说明 |
 | `include/features.h` | 132-163 | 清除所有 `__USE_*` 宏 |
 | `include/features.h` | 217-245 | `_GNU_SOURCE` → 开启所有子特性 |
 | `include/features.h` | 445-446 | `_GNU_SOURCE` → `__USE_GNU=1` |
 | `include/features.h` | 496-500 | GNU 废弃 scanf 扩展条件 |
-| `bits/libc-header-start.h` | 38-106 | ISO C 特性宏的每文件处理 |
+| `bits/libc-header-start.h` | 35-110 | ISO C 特性宏的每文件处理 |
