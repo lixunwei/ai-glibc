@@ -21,7 +21,7 @@
 struct pthread_key_struct __pthread_keys[PTHREAD_KEYS_MAX];
 ```
 
-**键结构**: `sysdeps/nptl/internaltypes.h:132-153`
+**键结构**: `sysdeps/nptl/internaltypes.h:132-142`
 
 ```c
 struct pthread_key_struct {
@@ -51,7 +51,7 @@ struct pthread_key_struct {
 
 ### pthread_key_create
 
-**源文件**: `nptl/pthread_key_create.c:24-47`
+**源文件**: `nptl/pthread_key_create.c:23-48`
 
 ```
 遍历 __pthread_keys[0..1023]:
@@ -69,7 +69,7 @@ return EAGAIN  // 所有槽位已满
 
 ### pthread_key_delete
 
-**源文件**: `nptl/pthread_key_delete.c:23-39`
+**源文件**: `nptl/pthread_key_delete.c:23-40`
 
 ```
 CAS(__pthread_keys[key].seq → seq+1)  // 奇→偶 = 释放
@@ -103,7 +103,7 @@ key 32~1023:
 
 ### pthread_setspecific
 
-**源文件**: `nptl/pthread_setspecific.c:34-88`
+**源文件**: `nptl/pthread_setspecific.c:23-90`
 
 ```
 验证 key < PTHREAD_KEYS_MAX
@@ -123,7 +123,7 @@ specific_used = true
 
 ### pthread_getspecific
 
-**源文件**: `nptl/pthread_getspecific.c:27-63`
+**源文件**: `nptl/pthread_getspecific.c:22-64`
 
 ```
 定位 entry（一级或二级）
@@ -178,7 +178,7 @@ for round = 0 to PTHREAD_DESTRUCTOR_ITERATIONS-1:
 
 ### 状态机
 
-**源文件**: `nptl/pthread_once.c:42-61`（注释描述），`65-143`（实现）
+**源文件**: `nptl/pthread_once.c:42-64`（注释描述），`65-144`（实现）
 
 ```
 ┌───────────┐    CAS 成功     ┌──────────────────────┐
@@ -199,7 +199,7 @@ for round = 0 to PTHREAD_DESTRUCTOR_ITERATIONS-1:
 
 ### 执行流程
 
-**源文件**: `nptl/pthread_once.c:65-143`（`__pthread_once_slow` + `___pthread_once`）
+**源文件**: `nptl/pthread_once.c:65-144`（`__pthread_once_slow` + `___pthread_once`）
 
 ```
 pthread_once(once_control, init_routine):
@@ -234,7 +234,7 @@ pthread_once(once_control, init_routine):
 **源文件**: `nptl/pthread_once.c:27-39`（`clear_once_control`），`114-118`（push/pop）
 
 ```c
-static void once_cleanup(void *arg) {
+static void clear_once_control(void *arg) {
     pthread_once_t *once_control = arg;
     atomic_store_relaxed(once_control, 0);  // 重置为初始状态
     futex_wake(once_control, INT_MAX, FUTEX_PRIVATE);  // 唤醒等待者
@@ -294,12 +294,12 @@ static void once_cleanup(void *arg) {
 | 文件 | 内容 |
 |------|------|
 | `nptl/pthread_keys.c:21-23` | 全局键表定义 |
-| `sysdeps/nptl/internaltypes.h:132-153` | `struct pthread_key_struct` |
-| `nptl/pthread_key_create.c:24-47` | 键分配 |
-| `nptl/pthread_key_delete.c:23-39` | 键释放 |
-| `nptl/pthread_setspecific.c:34-88` | 设置线程数据 |
-| `nptl/pthread_getspecific.c:27-63` | 获取线程数据 |
+| `sysdeps/nptl/internaltypes.h:132-142` | `struct pthread_key_struct` |
+| `nptl/pthread_key_create.c:23-48` | 键分配 |
+| `nptl/pthread_key_delete.c:23-40` | 键释放 |
+| `nptl/pthread_setspecific.c:23-90` | 设置线程数据 |
+| `nptl/pthread_getspecific.c:22-64` | 获取线程数据 |
 | `nptl/nptl_deallocate_tsd.c:33-86` | 析构函数调用 |
 | `nptl/descr.h` | `struct pthread` 中 specific 字段 |
-| `nptl/pthread_once.c:27-143` | once 完整实现（cleanup+slow+fast） |
+| `nptl/pthread_once.c:27-144` | once 完整实现（cleanup+slow+fast） |
 | `sysdeps/nptl/fork.h:31-36` | fork generation 机制 |

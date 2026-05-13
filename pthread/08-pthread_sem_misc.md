@@ -42,7 +42,7 @@ struct new_sem {
 |------|--------|------|
 | `sem_init` | `nptl/sem_init.c:26-52` | 初始化无名信号量 |
 | `sem_destroy` | `nptl/sem_destroy.c:24-30` | 销毁（当前为 no-op） |
-| `sem_wait` | `nptl/sem_waitcommon.c:123-313` | 等待（P 操作） |
+| `sem_wait` | `nptl/sem_wait.c:23-45`（入口），`nptl/sem_waitcommon.c:123-313`（核心实现） | 等待（P 操作） |
 | `sem_post` | `nptl/sem_post.c:31-77` | 释放（V 操作） |
 | `sem_timedwait` | `nptl/sem_timedwait.c:25-42` | 带超时等待 |
 | `sem_trywait` | — | 非阻塞尝试 |
@@ -167,7 +167,9 @@ int pthread_atfork(prepare, parent, child) {
 }
 ```
 
-**实际实现**: `posix/register-atfork.c:35-64`
+**实际实现**: `posix/register-atfork.c:35-64`（`__register_atfork` 函数）
+
+`struct fork_handler` 定义在 `include/register-atfork.h:23-30`：
 
 ```c
 struct fork_handler {

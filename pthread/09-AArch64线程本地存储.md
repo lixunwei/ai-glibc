@@ -381,7 +381,7 @@ _dl_update_slotinfo(req_modid, new_gen):
 
 ### 6.1 allocate_stack 中的 TLS
 
-**源文件**: `nptl/allocatestack.c:356-577`
+**源文件**: `nptl/allocatestack.c:356-658`
 
 ```
 allocate_stack(attr, &pd, &stack, &stacksize):
@@ -588,7 +588,7 @@ _dl_deallocate_tls(tcb, dealloc_tcb):
 
 ### 10.1 模块 ID 分配
 
-**源文件**: `elf/dl-tls.c:160-253`
+**源文件**: `elf/dl-tls.c:160-229`
 
 ```
 _dl_assign_tls_modid(link_map *l):
@@ -700,8 +700,8 @@ add x2, x2, x0    // x2 = TLS 变量绝对地址
 | `sysdeps/aarch64/tlsdesc.sym` | 汇编偏移量定义 |
 | `nptl/descr.h:148-183` | `struct pthread` 头部（TLS 相关） |
 | `nptl/descr.h:464-465` | `TLS_TPADJ` 宏 |
-| `elf/dl-tls.c:117-148` | `_dl_tls_static_surplus_init` |
-| `elf/dl-tls.c:160-253` | `_dl_assign_tls_modid` |
+| `elf/dl-tls.c:132-148` | `_dl_tls_static_surplus_init` |
+| `elf/dl-tls.c:160-229` | `_dl_assign_tls_modid` |
 | `elf/dl-tls.c:257-463` | `_dl_determine_tlsoffset`（含 AArch64 分支 374-456） |
 | `elf/dl-tls.c:465-493` | `allocate_dtv` |
 | `elf/dl-tls.c:522-552` | `_dl_allocate_tls_storage` |
@@ -711,10 +711,10 @@ add x2, x2, x0    // x2 = TLS 变量绝对地址
 | `elf/dl-tls.c:744-772` | `_dl_deallocate_tls` |
 | `elf/dl-tls.c:834-981` | `_dl_update_slotinfo` |
 | `elf/dl-tls.c:1090-1142` | `__tls_get_addr` |
-| `elf/dl-tls.c:1148-1170` | `_dl_tls_get_addr_soft` |
+| `elf/dl-tls.c:1148-1189` | `_dl_tls_get_addr_soft` |
 | `csu/libc-tls.c:39-71` | 静态链接 TLS 全局变量 |
 | `csu/libc-tls.c:100-165` | `__libc_setup_tls` |
-| `nptl/allocatestack.c:356-577` | `allocate_stack` (TLS 分配路径) |
+| `nptl/allocatestack.c:356-658` | `allocate_stack` (TLS 分配路径) |
 | `nptl/allocatestack.c:141-149` | 缓存栈 TLS 重初始化 |
 | `elf/dl-close.c:45-111` | `remove_slotinfo` (dlclose TLS 回收) |
 | `sysdeps/aarch64/dl-tlsdesc.S:76-81` | `_dl_tlsdesc_return` |

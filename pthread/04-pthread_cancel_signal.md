@@ -58,7 +58,7 @@ cancel_enabled_and_canceled_and_async(ch)  // 使能+已取消+异步
 ## 2. pthread_cancel 内部流程
 
 ```
-pthread_cancel(target_thread)           // pthread_cancel.c:58-153
+pthread_cancel(target_thread)           // pthread_cancel.c:58-154
     │
     ├── 1. 检查目标线程是否已退出
     │       if (joinstate == EXITED) return 0
@@ -95,7 +95,7 @@ POSIX 规定的取消点函数（部分）:
 glibc 使用 **syscall cancel bridge** 实现取消点:
 
 ```c
-// nptl/cancellation.c:22-63
+// nptl/cancellation.c:22-64
 __internal_syscall_cancel(...)
     │
     ├── 进入 cancellable 区域（标记 PC 范围）
@@ -249,7 +249,7 @@ pthread_kill(thread, signo)
             ├── 阻塞所有信号
             ├── 加锁 pd->exit_lock（防止线程退出竞态）
             ├── 检查线程是否 exiting
-            │   └── 是 → 返回 ESRCH
+            │   └── 是 → 返回 0（仅兼容符号 __pthread_kill_esrch 返回 ESRCH）
             ├── tgkill(pid, pd->tid, signo)
             └── 释放锁，恢复信号
 ```
@@ -269,14 +269,15 @@ pthread_kill(thread, signo)
 ### 9.1 实现 (nptl/pthread_sigmask.c:24-46)
 
 ```c
-int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset) {
+int __pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset) {
     sigset_t local;
-    if (set != NULL) {
+    if (set != NULL && __glibc_unlikely (__sigismember (set, SIGCANCEL)
+                       || __sigismember (set, SIGSETXID))) {
         local = *set;
         clear_internal_signals(&local);  // 移除 SIGCANCEL, SIGSETXID
+        set = &local;
     }
-    return sigprocmask(how, set ? &local : NULL, oldset);
-    // 底层调用 rt_sigprocmask 系统调用
+    return INTERNAL_SYSCALL_CALL (rt_sigprocmask, how, set, oldset, __NSIG_BYTES);
 }
 ```
 
@@ -359,12 +360,12 @@ int sigwait(const sigset_t *set, int *sig) {
 | 内容 | 文件:行号 |
 |------|-----------|
 | cancelhandling 位图 | descr.h:295-316 |
-| pthread_cancel 入口 | pthread_cancel.c:58-153 |
+| pthread_cancel 入口 | pthread_cancel.c:58-154 |
 | sigcancel_handler | pthread_cancel.c:31-56 |
 | pthread_setcancelstate | pthread_setcancelstate.c |
-| pthread_setcanceltype | pthread_setcanceltype.c:24-58 |
+| pthread_setcanceltype | pthread_setcanceltype.c:24-59 |
 | pthread_testcancel | pthread_testcancel.c:23-29 |
-| syscall cancel bridge | cancellation.c:22-63 |
+| syscall cancel bridge | cancellation.c:22-64 |
 | PC 范围检查 | cancellation-pc-check.h:24-52 |
 | __syscall_do_cancel | cancellation.c:84-110 |
 | cleanup push/pop | libc-cleanup.c:23-75 |

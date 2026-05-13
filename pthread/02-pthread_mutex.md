@@ -288,16 +288,16 @@ Private futex 性能更高（内核跳过全局哈希表查找）。
 
 | 内容 | 文件:行号 |
 |------|-----------|
-| mutex_init | pthread_mutex_init.c:31-137 |
+| mutex_init | pthread_mutex_init.c:50-152 |
 | mutex_lock (NORMAL) | pthread_mutex_lock.c:83-89 |
 | mutex_lock (RECURSIVE) | pthread_mutex_lock.c:90-112 |
 | mutex_lock (ADAPTIVE) | pthread_mutex_lock.c:113-145 |
 | mutex_lock (ERRORCHECK) | pthread_mutex_lock.c:148-155 |
-| mutex_lock (ROBUST) | pthread_mutex_lock.c:168-300 |
-| mutex_lock (PI) | pthread_mutex_lock.c:274-357 |
-| mutex_unlock | pthread_mutex_unlock.c:55-294 |
-| mutex_trylock | pthread_mutex_trylock.c:37-180 |
-| mutex_timedlock | pthread_mutex_timedlock.c:87-430 |
+| mutex_lock (ROBUST) | pthread_mutex_lock.c:176-338 |
+| mutex_lock (PI) | pthread_mutex_lock.c:344-496 |
+| mutex_unlock | pthread_mutex_unlock.c:47-352 |
+| mutex_trylock | pthread_mutex_trylock.c:25-443 |
+| mutex_timedlock | pthread_mutex_timedlock.c:31-570 |
 | lowlevellock 状态 | sysdeps/nptl/lowlevellock.h:26-45 |
 | lll_lock 实现 | sysdeps/nptl/lowlevellock.h:64-93 |
 | futex 慢路径 | nptl/lowlevellock.c:24-50 |

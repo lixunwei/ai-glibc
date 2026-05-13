@@ -257,11 +257,11 @@ start_thread (pthread_create.c:338)
 
 | 内容 | 文件:行号 |
 |------|-----------|
-| 主入口 | pthread_create.c:649-928 |
+| 主入口 | pthread_create.c:649-929 |
 | late_init | pthread_create.c:73 |
-| create_thread | pthread_create.c:234-300 |
+| create_thread | pthread_create.c:234-334 |
 | start_thread | pthread_create.c:338-627 |
-| allocate_stack | allocatestack.c:369-658 |
-| get_cached_stack | allocatestack.c:59-150 |
+| allocate_stack | allocatestack.c:356-659 |
+| get_cached_stack | allocatestack.c:59-151 |
 | struct pthread | descr.h:147-425 |
 | joinstate 枚举 | descr.h:135-144 |

@@ -168,8 +168,8 @@ pthread_cond_broadcast(cond)
 ### 初始化时设置
 
 ```c
-// pthread_cond_init.c:40-46
-pthread_condattr_setclock(&attr, CLOCK_MONOTONIC);
+// pthread_condattr_setclock.c:26-44 设置时钟属性
+// pthread_cond_init.c:40-45 将 monotonic 标志写入 __wrefs
 // 内部: __wrefs |= __PTHREAD_COND_CLOCK_MONOTONIC_MASK (bit1)
 ```
 
@@ -271,12 +271,12 @@ futex 是"睡眠/唤醒载体"，真正的正确性由序列号和双组机制�
 
 | 内容 | 文件:行号 |
 |------|-----------|
-| struct __pthread_cond_s | bits/thread-shared-types.h:94-104 |
-| cond_init | pthread_cond_init.c:26-49 |
+| struct __pthread_cond_s | sysdeps/nptl/bits/thread-shared-types.h:94-104 |
+| cond_init | pthread_cond_init.c:25-50 |
 | cond_wait 主循环 | pthread_cond_wait.c:329-445 |
 | cond_wait 算法说明 | pthread_cond_wait.c:173-328 |
-| cond_signal | pthread_cond_signal.c:37-95 |
-| cond_broadcast | pthread_cond_broadcast.c:37-87 |
-| cond_destroy | pthread_cond_destroy.c:41-58 |
+| cond_signal | pthread_cond_signal.c:33-95 |
+| cond_broadcast | pthread_cond_broadcast.c:37-88 |
+| cond_destroy | pthread_cond_destroy.c:40-59 |
 | 组切换逻辑 | pthread_cond_common.c:192-258 |
 | 取消处理 | pthread_cond_wait.c:77-171 |

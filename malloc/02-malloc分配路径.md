@@ -43,7 +43,7 @@ __libc_malloc(bytes):
   // 大 tcache bin (1024~1216)
   tc_idx = large_csize2tidx(nb)
   if tcache->entries[tc_idx] != NULL:
-    return tcache_get(tc_idx)
+    return tcache_get_large(tc_idx, nb)
   
   // 慢路径: 进入 arena
   arena = arena_get(thread_arena)
@@ -58,7 +58,7 @@ __libc_malloc(bytes):
 ```c
 // request2size: 用户请求 → 实际 chunk 大小
 #define request2size(req) \
-    (((req) + CHUNK_HDR_SZ + MALLOC_ALIGN_MASK) & ~MALLOC_ALIGN_MASK)
+    (((req) + SIZE_SZ + MALLOC_ALIGN_MASK) & ~MALLOC_ALIGN_MASK)
     // 至少 MINSIZE(32)
 
 // checked_request2size: 含溢出检查 + 标签对齐
@@ -91,7 +91,7 @@ if nb < MIN_LARGE_SIZE:
 
 ### 步骤 2: Unsorted Bin 扫描
 
-**源文件**: `malloc/malloc.c:3876-4015`
+**源文件**: `malloc/malloc.c:3876-4025`
 
 ```
 while (victim = unsorted_chunks(arena)->bk) != unsorted_chunks(arena):
@@ -136,7 +136,7 @@ bin = bin_at(arena, idx)
 
 if (victim = first(bin)) != bin:
   // 检查最大块是否够用
-  if chunksize(last(bin)) >= nb:
+  if chunksize(first(bin)) >= nb:
     // 沿 bk_nextsize 找最小够用的
     victim = traverse_nextsize(bin, nb)
     
@@ -153,7 +153,7 @@ if (victim = first(bin)) != bin:
 
 ### 步骤 4: Binmap 跳跃扫描
 
-**源文件**: `malloc/malloc.c:4105-4199`
+**源文件**: `malloc/malloc.c:4105-4200`
 
 ```
 // 当前 large bin 为空或不够大，扫描更大的 bin
@@ -164,7 +164,7 @@ map = arena->binmap[block]
 bit = next_set_bit(map, bit)
 if found:
   bin = bin_at(arena, bit_to_idx)
-  victim = last(bin)     // 取最大的（一定够用）
+  victim = last(bin)     // 取最小够用的（strict best-fit）
   split_and_return(victim, nb)
 ```
 

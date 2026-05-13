@@ -60,7 +60,7 @@ static __thread mstate thread_arena;
 
 ### arena_get2 — 创建或重用
 
-**源文件**: `malloc/arena.c:808-847`
+**源文件**: `malloc/arena.c:802-849`
 
 ```
 arena_get2(size, avoid):
@@ -142,8 +142,8 @@ _int_new_arena(size):
   lock(list_lock)
   a->next = main_arena.next
   main_arena.next = a
-  narenas++
   unlock(list_lock)
+  // narenas 在 arena_get2 中通过原子 CAS 递增 (arena.c:837-843)
   
   // 5. 绑定当前线程
   thread_arena = a
@@ -153,14 +153,16 @@ _int_new_arena(size):
 
 ### new_heap — 分配堆内存
 
-**源文件**: `malloc/arena.c:343-452`
+**源文件**: `malloc/arena.c:343-453`（`alloc_new_heap` 343-437 + `new_heap` 440-453）
 
 ```
-new_heap(size):
-  // mmap 一个 HEAP_MAX_SIZE 对齐的区域
-  p = mmap(NULL, HEAP_MAX_SIZE, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS)
-  // 对齐到 HEAP_MAX_SIZE 边界
+alloc_new_heap(size):
+  // 先映射 max_size*2 区域再裁剪对齐（或 mmap HEAP_MAX_SIZE 直接对齐）
+  p = mmap(NULL, HEAP_MAX_SIZE*2, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS)
   aligned = ALIGN_UP(p, HEAP_MAX_SIZE)
+  // 裁掉多余部分
+  munmap(p, aligned - p)
+  munmap(aligned + HEAP_MAX_SIZE, ...)
   
   // 只开放需要的部分
   mprotect(aligned, size, PROT_READ|PROT_WRITE)
@@ -189,6 +191,7 @@ grow_heap(heap, diff):
 
 shrink_heap(heap, diff):
   new_size = heap->size - diff
+  // 优先尝试 MAP_FIXED 重映射为 PROT_NONE，否则 madvise
   madvise(heap + new_size, diff, MADV_DONTNEED)  // 释放物理页
   heap->size = new_size
 ```
@@ -282,13 +285,13 @@ tcache_init(arena):
 
 ### tcache_put / tcache_get
 
-**源文件**: `malloc/malloc.c:2982-3038`
+**源文件**: `malloc/malloc.c:2982-3039`
 
 ```
 tcache_put(chunk, tc_idx):
   e = chunk2mem(chunk)
   e->key = tcache_key             // 标记已入 tcache
-  e->next = tcache->entries[tc_idx]
+  e->next = PROTECT_PTR(&e->next, tcache->entries[tc_idx])  // 指针保护
   tcache->entries[tc_idx] = e
   tcache->num_slots[tc_idx]--     // 递减可用槽位
 
@@ -316,8 +319,10 @@ free 时检测:
   e = chunk2mem(p)
   if e->key == tcache_key:
     // 可能是双重释放，遍历链表确认
-    tcache_double_free_verify(e, tc_idx):
-      for each entry in tcache->entries[tc_idx]:
+    tcache_double_free_verify(e):
+      // 遍历所有 TCACHE_MAX_BINS 检查 (malloc.c:3119-3145)
+      for each bin in tcache->entries[0..TCACHE_MAX_BINS-1]:
+        for each entry in bin:
         if entry == e:
           malloc_printerr("free(): double free detected in tcache")
 ```
@@ -380,12 +385,12 @@ main_arena → arena_1 → arena_2 → ... → main_arena
 | `malloc/arena.c:487-515` | `shrink_heap` |
 | `malloc/arena.c:520-592` | `heap_trim` |
 | `malloc/arena.c:615-680` | `_int_new_arena` |
-| `malloc/arena.c:802-847` | `arena_get2` + 限制逻辑 |
+| `malloc/arena.c:802-849` | `arena_get2` + 限制逻辑 |
 | `malloc/arena.c:855-871` | `arena_get_retry` |
 | `malloc/arena.c:875-897` | `__malloc_arena_thread_freeres` |
 | `malloc/malloc.c:1794-1805` | `main_arena` 定义 |
 | `malloc/malloc.c:2864-2907` | Tcache 结构定义 |
 | `malloc/malloc.c:2931-2970` | `tcache_key` 初始化 |
-| `malloc/malloc.c:2982-3038` | `tcache_put` / `tcache_get` |
+| `malloc/malloc.c:2982-3039` | `tcache_put` / `tcache_get` |
 | `malloc/malloc.c:3119-3145` | 双重释放验证 |
 | `malloc/malloc.c:3182-3210` | `tcache_init` |

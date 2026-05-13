@@ -29,7 +29,7 @@ typedef volatile int pthread_spinlock_t;
 ### 2.1 pthread_spin_init
 
 ```c
-// pthread_spin_init.c:25-27
+// pthread_spin_init.c:22-27
 int pthread_spin_init(pthread_spinlock_t *lock, int pshared) {
     atomic_store_relaxed(lock, 0);
     return 0;
@@ -42,7 +42,7 @@ int pthread_spin_init(pthread_spinlock_t *lock, int pshared) {
 ### 2.2 pthread_spin_lock
 
 ```c
-// pthread_spin_lock.c:28-61
+// pthread_spin_lock.c:23-63
 int pthread_spin_lock(pthread_spinlock_t *lock) {
     // 快速路径: 尝试 0→1
     if (atomic_exchange_acquire(lock, 1) == 0)
@@ -70,7 +70,7 @@ int pthread_spin_lock(pthread_spinlock_t *lock) {
 ### 2.3 pthread_spin_trylock
 
 ```c
-// pthread_spin_trylock.c:27-30
+// pthread_spin_trylock.c:24-30
 int pthread_spin_trylock(pthread_spinlock_t *lock) {
     return (atomic_exchange_acquire(lock, 1) == 0) ? 0 : EBUSY;
 }
@@ -82,7 +82,7 @@ int pthread_spin_trylock(pthread_spinlock_t *lock) {
 ### 2.4 pthread_spin_unlock
 
 ```c
-// pthread_spin_unlock.c:26-30
+// pthread_spin_unlock.c:23-30
 int pthread_spin_unlock(pthread_spinlock_t *lock) {
     atomic_store_release(lock, 0);
     return 0;
@@ -368,7 +368,7 @@ pthread_rwlock_unlock(rwlock)
 
 | 内容 | 文件:行号 |
 |------|-----------|
-| spin_init | pthread_spin_init.c:25-27 |
+| spin_init | pthread_spin_init.c:22-27 |
 | spin_lock | pthread_spin_lock.c:24-63 |
 | spin_trylock | pthread_spin_trylock.c:25-30 |
 | spin_unlock | pthread_spin_unlock.c:24-30 |
@@ -379,7 +379,7 @@ pthread_rwlock_unlock(rwlock)
 | 内容 | 文件:行号 |
 |------|-----------|
 | 数据结构 | bits/struct_rwlock.h:29-51 |
-| rwlock_init | pthread_rwlock_init.c:23-55 |
+| rwlock_init | pthread_rwlock_init.c:31-55 |
 | 核心算法 | pthread_rwlock_common.c:30-944 |
 | 偏好策略说明 | pthread_rwlock_common.c:30-58 |
 | 读者计数编码 | pthread_rwlock_common.c:65-96 |
