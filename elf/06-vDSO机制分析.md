@@ -84,7 +84,7 @@ vDSO 调用:
 
 ### 3.1 第一步: 解析辅助向量
 
-**源文件**: `sysdeps/unix/sysv/linux/dl-parse_auxv.h:31-61`
+**源文件**: `sysdeps/unix/sysv/linux/dl-parse_auxv.h:31-70`
 
 ```c
 void _dl_parse_auxv(ElfW(auxv_t) *av, dl_parse_auxv_t auxv_values) {
@@ -97,8 +97,10 @@ void _dl_parse_auxv(ElfW(auxv_t) *av, dl_parse_auxv_t auxv_values) {
   
   // 关键: 记录 vDSO 的 ELF 头地址
   GLRO(dl_sysinfo_dso) = (void *) auxv_values[AT_SYSINFO_EHDR];   // 行 57
+#ifdef NEED_DL_SYSINFO   // x86 定义, AArch64 不定义
   if (GLRO(dl_sysinfo_dso) != NULL)
     GLRO(dl_sysinfo) = auxv_values[AT_SYSINFO];                    // 行 59-60
+#endif
 }
 ```
 
@@ -405,8 +407,8 @@ if (pc[0] != MOVZ_X8_8B || pc[1] != SVC_0)
     ├─ 内核: 设置 auxv[AT_SYSINFO_EHDR] = vDSO 地址
     │
     ▼
-_dl_parse_auxv (dl-parse_auxv.h:31-61)
-    │ GLRO(dl_sysinfo_dso) = auxv[AT_SYSINFO_EHDR]
+_dl_parse_auxv (dl-parse_auxv.h:31-70)
+    │ GLRO(dl_sysinfo_dso) = (void *) auxv_values[AT_SYSINFO_EHDR]
     ▼
 setup_vdso (setup-vdso.h:19-114)        ← rtld.c:1733
     │ 解析 vDSO ELF 头
@@ -456,8 +458,8 @@ __clock_gettime64 (clock_gettime.c:28-86)
 | 文件:行 | 内容 |
 |---------|------|
 | `elf/elf.h:1255-1256` | `AT_SYSINFO=32, AT_SYSINFO_EHDR=33` |
-| `sysdeps/unix/sysv/linux/dl-parse_auxv.h:31-61` | `_dl_parse_auxv` (辅助向量解析) |
-| `sysdeps/unix/sysv/linux/dl-parse_auxv.h:57` | `GLRO(dl_sysinfo_dso) = auxv[AT_SYSINFO_EHDR]` |
+| `sysdeps/unix/sysv/linux/dl-parse_auxv.h:31-70` | `_dl_parse_auxv` (辅助向量解析) |
+| `sysdeps/unix/sysv/linux/dl-parse_auxv.h:57` | `GLRO(dl_sysinfo_dso) = (void *) auxv_values[AT_SYSINFO_EHDR]` |
 | `elf/setup-vdso.h:19-114` | `setup_vdso` (构建 vDSO link_map) |
 | `elf/setup-vdso.h:32-33` | `_dl_new_object` 创建 vDSO 对象 |
 | `elf/setup-vdso.h:67-68` | `elf_get_dynamic_info` + `_dl_setup_hash` |

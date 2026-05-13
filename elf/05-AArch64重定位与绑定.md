@@ -492,7 +492,7 @@ _dl_tlsdesc_dynamic:
 | `sysdeps/aarch64/dl-machine.h:227-256` | TLSDESC 描述符设置 |
 | `sysdeps/aarch64/dl-machine.h:258-277` | TLS_DTPMOD/DTPREL/TPREL |
 | `sysdeps/aarch64/dl-machine.h:279-284` | IRELATIVE (IFUNC) |
-| `sysdeps/aarch64/dl-machine.h:304-374` | `elf_machine_lazy_rel`（延迟绑定） |
+| `sysdeps/aarch64/dl-machine.h:304-372` | `elf_machine_lazy_rel`（延迟绑定） |
 | `sysdeps/aarch64/dl-machine.h:316-337` | Variant PCS 特殊处理 |
 | `sysdeps/aarch64/dl-trampoline.S:36-123` | `_dl_runtime_resolve` |
 | `sysdeps/aarch64/dl-trampoline.S:129-327` | `_dl_runtime_profile` |

@@ -5,13 +5,13 @@
 | 函数 | 源文件 | 说明 |
 |------|--------|------|
 | `dlopen` | `dlfcn/dlopen.c:75-103` | 加载共享库 |
-| `dlsym` | `dlfcn/dlsym.c:35-58` | 查找符号 |
+| `dlsym` | `dlfcn/dlsym.c:35-69` | 查找符号 |
 | `dlclose` | `dlfcn/dlclose.c:23-32` | 卸载共享库 |
-| `dladdr` | `elf/dl-addr.c:117-138` | 地址反查符号/库 |
+| `dladdr` | `dlfcn/dladdr.c:23-31` | 地址反查符号/库（核心逻辑 `elf/dl-addr.c:117-138`） |
 | `dlerror` | `dlfcn/dlerror.c:31-104` | 获取错误信息 |
-| `dlinfo` | `dlfcn/dlinfo.c:37-95` | 查询库信息 |
+| `dlinfo` | `dlfcn/dlinfo.c:37-114` | 查询库信息 |
 | `dlmopen` | `dlfcn/dlmopen.c:45-108` | 命名空间加载 |
-| `dl_iterate_phdr` | `elf/dl-iteratephdr.c:30-83` | 遍历所有已加载对象 |
+| `dl_iterate_phdr` | `elf/dl-iteratephdr.c:31-84` | 遍历所有已加载对象 |
 
 ---
 
@@ -30,10 +30,10 @@ dlopen(filename, flags)
 
 ### _dl_open 核心流程
 
-**源文件**: `elf/dl-open.c:513-747`
+**源文件**: `elf/dl-open.c:513-748`
 
 ```
-_dl_open_worker_begin(filename, mode):
+dl_open_worker_begin(filename, mode):
   │
   ├─ 1. 查找/映射目标文件
   │     _dl_map_new_object(filename, ...)
@@ -70,7 +70,7 @@ _dl_open_worker_begin(filename, mode):
 
 ### dlopen 标志
 
-**源文件**: `dlfcn/dlopen.c:51-53`，`dlfcn/dlfcn.h:37-50`
+**源文件**: `dlfcn/dlopen.c:51-53`，`bits/dlfcn.h:23-41`
 
 | 标志 | 值 | 说明 |
 |------|-----|------|
@@ -97,7 +97,7 @@ dlopen 使用两级锁:
 
 ### 调用路径
 
-**源文件**: `dlfcn/dlsym.c:35-58`，`elf/dl-sym.c:88-196`
+**源文件**: `dlfcn/dlsym.c:35-69`，`elf/dl-sym.c:88-196`
 
 ```
 dlsym(handle, symbol)
@@ -173,7 +173,7 @@ caller_map = _dl_sym_find_caller_link_map(who)
 
 ### 调用路径
 
-**源文件**: `elf/dl-close.c:114-758`（`_dl_close_worker`），`762-800`（`_dl_close`）
+**源文件**: `elf/dl-close.c:114-758`（`_dl_close_worker`），`762-801`（`_dl_close`）
 
 ```
 dlclose(handle)
@@ -239,7 +239,7 @@ dlclose(handleA)   → libA.opencount = 0  (执行卸载)
 
 ## 五、dladdr — 地址反查
 
-**源文件**: `elf/dl-addr.c:117-138`
+**源文件**: `elf/dl-addr.c:117-138`（内部函数 `_dl_addr`，公共入口 `dlfcn/dladdr.c:23-31`）
 
 ```
 dladdr(addr, info):
@@ -267,7 +267,7 @@ dladdr(addr, info):
 
 ## 六、dl_iterate_phdr
 
-**源文件**: `elf/dl-iteratephdr.c:30-83`
+**源文件**: `elf/dl-iteratephdr.c:31-84`
 
 ```c
 int dl_iterate_phdr(callback, data):
@@ -400,15 +400,15 @@ dlerror():
 | 文件:行 | 内容 |
 |---------|------|
 | `dlfcn/dlopen.c:46-103` | dlopen 入口 + 标志验证 |
-| `elf/dl-open.c:513-747` | `_dl_open_worker_begin` 核心 |
+| `elf/dl-open.c:513-748` | `dl_open_worker_begin` 核心 |
 | `elf/dl-open.c:812` | `_dl_open` 入口 |
-| `dlfcn/dlsym.c:35-58` | dlsym 入口 |
+| `dlfcn/dlsym.c:35-69` | dlsym 入口 |
 | `elf/dl-sym.c:88-196` | `_dl_sym` 查找逻辑 |
 | `elf/dl-close.c:114-758` | `_dl_close_worker` 卸载 |
 | `elf/dl-close.c:249-270` | 析构函数调用 |
 | `elf/dl-close.c:631-710` | munmap + 清理 |
 | `elf/dl-addr.c:117-138` | `_dl_addr` 地址反查 |
-| `elf/dl-iteratephdr.c:30-83` | `dl_iterate_phdr` |
+| `elf/dl-iteratephdr.c:31-84` | `dl_iterate_phdr` |
 | `dlfcn/dlmopen.c:45-108` | dlmopen 命名空间 |
 | `dlfcn/dlerror.c:31-197` | 错误管理 |
-| `dlfcn/dlinfo.c:37-95` | dlinfo 查询 |
+| `dlfcn/dlinfo.c:37-114` | dlinfo 查询 |
