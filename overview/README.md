@@ -49,7 +49,7 @@ glibc 支持以下 Linux 架构:
 | **NPTL 线程库** | [../pthread/](../pthread/) | 线程创建、互斥锁、条件变量、屏障、TSD、信号量、TLS、Futex、栈空间布局、pthread_cancel/cleanup 深度分析、线程创建调用链、同步原语调用链 等 15 篇 |
 | **ptmalloc2 内存分配器** | [../malloc/](../malloc/) | 数据结构、分配路径、释放路径、Arena/Tcache、调优调试、malloc/free 调用链 6 篇 |
 | **ld.so 动态链接器** | [../elf/](../elf/) | 启动加载、符号解析、重定位绑定、dlopen、AArch64 重定位、vDSO 机制、dlopen 搜索/dladdr、ldconfig/ld.so.cache、dl-tls/object/sort/find、启动调用链、延迟绑定调用链、dlopen/dlsym 调用链 12 篇 |
-| **信号子系统** | [../signal/](../signal/) | 数据结构、sigaction 调用链、信号掩码、线程交互、AArch64 信号帧、SIGCANCEL/SIGSETXID 内部信号 6 篇 |
+| **信号子系统** | [../signal/](../signal/) | 数据结构、sigaction 调用链、信号掩码、线程交互、AArch64 信号帧、SIGCANCEL/SIGSETXID 内部信号、信号子系统调用链 7 篇 |
 | **stdio/IO 子系统** | [../stdio/](../stdio/) | FILE 结构与 vtable、流生命周期与缓冲、读写路径与刷新机制 3 篇 |
 
 ## 专题分析
@@ -61,6 +61,8 @@ glibc 支持以下 Linux 架构:
 | [12-_GNU_SOURCE宏分析.md](12-_GNU_SOURCE宏分析.md) | 特性测试宏机制、features.h 处理流程、__USE_GNU 守卫的 227 个功能块分类汇总 |
 | [13-clangd开发环境搭建.md](13-clangd开发环境搭建.md) | AArch64 交叉编译 glibc + clangd 语义分析环境搭建指南 (compile_commands.json 生成、.clangd 配置) |
 | [14-libc_start_main程序启动调用链.md](14-libc_start_main程序启动调用链.md) | _start→__libc_start_main→main() 完整 7 阶段初始化调用链、安全初始化、退出处理 |
+| [15-execve_posix_spawn进程执行调用链.md](15-execve_posix_spawn进程执行调用链.md) | **调用链**：posix_spawn→spawni→clone3+exec、execvpe PATH 搜索、fexecve、system() |
+| [16-exit进程退出清理调用链.md](16-exit进程退出清理调用链.md) | **调用链**：exit→__run_exit_handlers→atexit/cxa_finalize/TLS dtors/_IO_cleanup、quick_exit、abort |
 
 ## 辅助文档
 

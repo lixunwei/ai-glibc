@@ -55,6 +55,7 @@
 | [04-高级特性与线程交互.md](04-高级特性与线程交互.md) | sigaltstack、实时信号、pthread_kill、SIGSETXID、abort |
 | [05-AArch64信号帧与投递返回.md](05-AArch64信号帧与投递返回.md) | 信号帧布局、SA_RESTORER、vDSO 跳板、栈回溯、getcontext/setcontext |
 | [06-SIGCANCEL与SIGSETXID内部信号.md](06-SIGCANCEL与SIGSETXID内部信号.md) | 信号定义与保留、用户屏蔽、cancelhandling 状态机、取消流程、凭据广播协议 |
+| [07-sigaction信号子系统调用链.md](07-sigaction信号子系统调用链.md) | **调用链**：sigaction 注册→raise/pthread_kill 投递→sigreturn 返回、SIGCANCEL/SIGSETXID 完整路径 |
 
 ## 源文件布局
 
