@@ -13,6 +13,7 @@
 | [03-free释放路径.md](03-free释放路径.md) | 释放算法 | tcache插入、合并、smallbin/unsorted bin、内存归还 |
 | [04-Arena与Tcache.md](04-Arena与Tcache.md) | 多线程扩展 | Arena 创建/绑定、tcache 无锁快速路径 |
 | [05-调优与调试.md](05-调优与调试.md) | 配置与诊断 | mallopt、tunables、realloc/calloc/memalign |
+| [06-malloc_free调用链.md](06-malloc_free调用链.md) | malloc/free 完整调用链 | clangd 精确分析：tcache快速路径→arena锁→_int_malloc→sysmalloc→mmap/sbrk；三阶段free架构（2.43新设计）；完整数据流时序 |
 
 ---
 

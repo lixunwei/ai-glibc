@@ -21,6 +21,8 @@
 | [11-线程栈空间布局.md](11-线程栈空间布局.md) | 栈空间布局 | 初始栈argv/envp/auxv、mmap栈布局、TCB定位、guard page、栈金丝雀、栈缓存复用 |
 | [12-pthread_cancel深度分析.md](12-pthread_cancel深度分析.md) | 取消机制深度分析 | cancelhandling 状态机、SIGCANCEL 信号、可取消系统调用桥（AArch64 汇编）、栈展开、NOCANCEL 变体、与 Bionic 对比 |
 | [13-pthread_cleanup深度分析.md](13-pthread_cleanup深度分析.md) | 清理处理器深度分析 | 三套宏路径（C++ RAII/GCC cleanup/setjmp）、双链架构、注册/展开、defer 变体、combined 宏、condvar cleanup、C++ 交互 |
+| [14-pthread_create调用链.md](14-pthread_create调用链.md) | 线程创建完整调用链 | clangd 精确分析：__pthread_create_2_1→allocate_stack→create_thread→clone3→start_thread，4层深度43个函数 |
+| [15-线程同步原语调用链.md](15-线程同步原语调用链.md) | 线程同步完整调用链 | mutex lock/unlock、condvar wait/signal/broadcast、futex 底层路径、自适应自旋、双组轮转算法时序图 |
 
 ---
 
