@@ -64,6 +64,7 @@ glibc 支持以下 Linux 架构:
 | [15-execve_posix_spawn进程执行调用链.md](15-execve_posix_spawn进程执行调用链.md) | **调用链**：posix_spawn→spawni→clone3+exec、execvpe PATH 搜索、fexecve、system() |
 | [16-exit进程退出清理调用链.md](16-exit进程退出清理调用链.md) | **调用链**：exit→__run_exit_handlers→atexit/cxa_finalize/TLS dtors/_IO_cleanup、quick_exit、abort |
 | [17-socket网络子系统调用链.md](17-socket网络子系统调用链.md) | **调用链**：socket/bind/listen/connect/accept/send/recv 薄封装 + SYSCALL_CANCEL 取消点 + socketcall 兼容 |
+| [18-open_read_write文件IO调用链.md](18-open_read_write文件IO调用链.md) | **调用链**：open/read/write/close/pread/pwrite/readv/writev + nocancel 版本 + LFS 透明 + openat 统一 |
 
 ## 辅助文档
 
