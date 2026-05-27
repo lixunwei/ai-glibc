@@ -63,6 +63,7 @@ glibc 支持以下 Linux 架构:
 | [14-libc_start_main程序启动调用链.md](14-libc_start_main程序启动调用链.md) | _start→__libc_start_main→main() 完整 7 阶段初始化调用链、安全初始化、退出处理 |
 | [15-execve_posix_spawn进程执行调用链.md](15-execve_posix_spawn进程执行调用链.md) | **调用链**：posix_spawn→spawni→clone3+exec、execvpe PATH 搜索、fexecve、system() |
 | [16-exit进程退出清理调用链.md](16-exit进程退出清理调用链.md) | **调用链**：exit→__run_exit_handlers→atexit/cxa_finalize/TLS dtors/_IO_cleanup、quick_exit、abort |
+| [17-socket网络子系统调用链.md](17-socket网络子系统调用链.md) | **调用链**：socket/bind/listen/connect/accept/send/recv 薄封装 + SYSCALL_CANCEL 取消点 + socketcall 兼容 |
 
 ## 辅助文档
 
